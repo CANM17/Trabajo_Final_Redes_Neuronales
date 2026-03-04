@@ -45,4 +45,3 @@ python -m venv venv
 .\venv\Scripts\activate
 
 # Instalar dependencias actualizadas
-pip install fastapi uvicorn tensorflow scikit-learn joblib gradio pandas numpy requests
