@@ -1,0 +1,21 @@
+# Web framework y servidor ASGI
+fastapi
+uvicorn[standard]
+
+# Validación de datos
+pydantic
+
+# Deep Learning
+tensorflow
+
+# Machine Learning / Preprocesamiento
+scikit-learn
+joblib
+
+# Datos
+numpy
+pandas
+
+# Visualización (usada en el notebook)
+matplotlib
+seaborn

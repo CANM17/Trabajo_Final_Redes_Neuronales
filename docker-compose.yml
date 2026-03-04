@@ -1,0 +1,54 @@
+# ══════════════════════════════════════════════════════════════
+#  docker-compose.yml — IDS Sistema completo
+#  Levanta DOS servicios:
+#    • api     → FastAPI en puerto 8000
+#    • gradio  → Interfaz Gradio en puerto 7860
+# ══════════════════════════════════════════════════════════════
+#
+#  Cómo usar:
+#    docker compose up --build        # Primera vez (construye imágenes)
+#    docker compose up                # Veces siguientes
+#    docker compose down              # Apagar
+#
+# ══════════════════════════════════════════════════════════════
+
+version: "3.9"
+
+services:
+
+  # ── Servicio 1: API FastAPI ───────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ids_api
+    ports:
+      - "8080:8080"            # Host:Contenedor
+    volumes:
+      # Montar la carpeta de modelos como volumen para no tener que
+      # reconstruir la imagen cada vez que se reentrena el modelo.
+      - ./models:/proyecto/models:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # ── Servicio 2: Interfaz Gradio ───────────────────────────
+  gradio:
+    build:
+      context: .
+      dockerfile: Dockerfile.gradio
+    container_name: ids_gradio
+    ports:
+      - "7860:7860"
+    environment:
+      # Dentro de Docker, Gradio debe apuntar al nombre del servicio "api",
+      # NO a "localhost" (que sería el propio contenedor de Gradio).
+      - API_URL=http://api:8080
+    depends_on:
+      api:
+        condition: service_healthy   # Espera que la API esté lista
+    restart: unless-stopped
